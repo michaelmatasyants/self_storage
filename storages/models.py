@@ -30,9 +30,19 @@ class Storage(models.Model):
         return f'self.title адрес: self.city self.address'
 
 
+# class BoxType(models.Model):
+#     length = models.FloatField('Длина')
+#     width = models.FloatField('Ширина')
+#     height = models.FloatField('Высота')
+#     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+
+
 class Box(models.Model):
     title = models.CharField('Бокс', max_length=100)
     is_free = models.BooleanField('Статус', default=True)
+    # box_type = models.ForeignKey(BoxType,
+    #                              on_delete=models.CASCADE,
+    #                              related_name='boxes')
     storage = models.ForeignKey(Storage,
                                 on_delete=models.CASCADE,
                                 related_name='boxes',
