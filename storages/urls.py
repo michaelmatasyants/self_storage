@@ -9,4 +9,5 @@ urlpatterns = [
     path('my_rent/<int:user_id>/',
          views.show_personal_account,
          name='my_rent'),
+    path('login/', views.login_user, name='login'),
 ]
