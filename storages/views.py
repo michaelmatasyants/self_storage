@@ -17,6 +17,12 @@ def serialize_storage(storage: Storage):
     }
 
 
+def serialize_user(user: CustomUser):
+    return {
+
+    }
+
+
 # def serialize_faq(question: FAQ):
 #     return {
 #         'question': question.question,
@@ -75,8 +81,15 @@ def choose_boxes(request):
 
 
 # не дописан
-def show_personal_account(request, user_id):
-    return render(request, 'my-rent.html')
+def show_personal_account(request):
+    user = request.user
+    
+    orders = user.orders.all()
+    context = {
+        'user': serialize_user(user),
+        'orders': orders
+    }
+    return render(request, 'my-rent.html', context=context)
 
 
 # def show_faq(request):
