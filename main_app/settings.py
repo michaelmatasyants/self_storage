@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
+    "phonenumber_field",
     'storages',
 ]
 
@@ -43,7 +44,7 @@ ROOT_URLCONF = 'main_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'storages', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,30 +63,18 @@ WSGI_APPLICATION = 'main_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation  \
-                       .UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation  \
-                       .MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation  \
-                       .CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation  \
-                       .NumericPasswordValidator',
-    },
+
 ]
 
+AUTH_USER_MODEL = 'storages.CustomUser'
+
+AUTHENTICATION_BACKENDS = ['storages.backends.EmailBackend']
 
 LANGUAGE_CODE = 'en-us'
 
