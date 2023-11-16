@@ -90,6 +90,6 @@ media/
 venv/
 **.vscode
 **.idea
-/static/*
+**assets
 **/migrations/
 **.mypy_cache
