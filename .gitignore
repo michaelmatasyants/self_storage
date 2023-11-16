@@ -88,9 +88,8 @@ target/
 db.sqlite3
 media/
 venv/
-assets/*
+/assets/
 **.vscode
 **.idea
-/static/*
 **/migrations/
 **.mypy_cache
