@@ -64,7 +64,7 @@ class Box(models.Model):
 class Order(models.Model):
     client = models.ForeignKey(CustomUser,
                                on_delete=models.CASCADE,
-                               related_name='clients',
+                               related_name='orders',
                                verbose_name='Клиент',
                                )
     box = models.ForeignKey(Box,
