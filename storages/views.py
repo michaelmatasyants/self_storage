@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db.models import Prefetch, Count
-from storages.beckends import EmailBackend
+from storages.backends import EmailBackend
 from storages.models import CustomUser, Storage, Box, Order #, FAQ, BoxType
 
 

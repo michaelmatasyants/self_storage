@@ -88,6 +88,7 @@ target/
 db.sqlite3
 media/
 venv/
+assets/*
 **.vscode
 **.idea
 /static/*
