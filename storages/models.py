@@ -50,6 +50,7 @@ class BoxType(models.Model):
         return f'Бокс {self.length}м х {self.width}м х {self.height}м'
 
 
+
 class Box(models.Model):
     title = models.CharField('Бокс', max_length=100)
     is_free = models.BooleanField('Статус', default=True)
