@@ -73,7 +73,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'storages.CustomUser'
-
+LOGOUT_REDIRECT_URL = "/"
 AUTHENTICATION_BACKENDS = ['storages.backends.EmailBackend']
 
 LANGUAGE_CODE = 'en-us'

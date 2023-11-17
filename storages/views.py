@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
-from storages.forms import LoginForm
+from storages.forms import LoginForm, RegistrationForm
 
 
 def login_user(request):
@@ -20,12 +20,41 @@ def login_user(request):
                 form.add_error(None, ValidationError("Неверный email или пароль."))
     else:
         form = LoginForm()
-    return render(request, "index.html", {"form": form})
+    return render(request, "aside/login.html", {"form": form})
+
+
+def register_user(request, *args, **kwargs):
+    if request.method == 'POST':
+        print(request.POST)
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+
+            form.save()
+            user = authenticate(
+                request,
+                email=form.cleaned_data.get('email'),
+                password=form.cleaned_data.get('password1'),
+            )
+            user = form.cleaned_data.get('email')
+            print(type(user), user)
+            login(request, user)
+            # destination = kwargs.get("next")
+            # if destination:
+            #     return redirect(destination)
+            return redirect("index")
+    else:
+        form = RegistrationForm()
+    return render(request, 'aside/registration.html', {form: form})
 
 
 def index(request):
     '''Main_page view'''
-    return render(request, 'index.html')
+
+    context = {
+        'login_form': LoginForm(),
+        'registration_form': RegistrationForm(),
+    }
+    return render(request, 'index.html', context)
 
 
 def faq(request):
