@@ -1,7 +1,8 @@
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
 from decimal import Decimal
 
-from django.contrib.auth.models import AbstractUser
-from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from tinymce.models import HTMLField
 
@@ -30,8 +31,7 @@ class Storage(models.Model):
         verbose_name_plural = 'Склады'
 
     def __str__(self):
-        return f'{self.title} адрес: {self.city} {self.address}'
-
+        return f'self.title адрес: self.city self.address'
 
 
 class BoxType(models.Model):
