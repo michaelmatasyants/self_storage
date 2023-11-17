@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from phonenumber_field.modelfields import PhoneNumberField
+
 from decimal import Decimal
+
+from phonenumber_field.modelfields import PhoneNumberField
+from tinymce.models import HTMLField
 
 
 class CustomUser(AbstractUser):
@@ -21,6 +24,7 @@ class Storage(models.Model):
     city = models.CharField('Город', max_length=100)
     address = models.CharField('Адрес', max_length=200)
     photo = models.ImageField('Фото')
+    temp = models.IntegerField('Температура', default=0)
 
     class Meta:
         verbose_name = 'Склад'
@@ -30,28 +34,33 @@ class Storage(models.Model):
         return f'self.title адрес: self.city self.address'
 
 
-# class BoxType(models.Model):
-#     length = models.FloatField('Длина')
-#     width = models.FloatField('Ширина')
-#     height = models.FloatField('Высота')
-#     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+class BoxType(models.Model):
+    length = models.FloatField('Длина')
+    width = models.FloatField('Ширина')
+    height = models.FloatField('Высота')
+    price = models.DecimalField(max_digits=10,
+                                decimal_places=2,
+                                default=Decimal('0.00'))
+
+    class Meta:
+        verbose_name = 'Тип боксов'
+        verbose_name_plural = 'Типы боксов'
+
+    def __str__(self):
+        return f'Бокс {self.length}м х {self.width}м х {self.height}м'
 
 
 class Box(models.Model):
     title = models.CharField('Бокс', max_length=100)
     is_free = models.BooleanField('Статус', default=True)
-    # box_type = models.ForeignKey(BoxType,
-    #                              on_delete=models.CASCADE,
-    #                              related_name='boxes')
+    box_type = models.ForeignKey(BoxType,
+                                 on_delete=models.CASCADE,
+                                 related_name='boxes')
     storage = models.ForeignKey(Storage,
                                 on_delete=models.CASCADE,
                                 related_name='boxes',
                                 null=True,
                                 )
-    length = models.FloatField('Длина')
-    width = models.FloatField('Ширина')
-    height = models.FloatField('Высота')
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
 
     class Meta:
         verbose_name = 'Бокс'
@@ -82,3 +91,15 @@ class Order(models.Model):
 
     def __str__(self):
         return f'self.client бокс: self.box'
+
+
+class FAQ(models.Model):
+    question = models.TextField('Вопрос')
+    answer = HTMLField('Ответ')
+
+    class Meta:
+        verbose_name = 'FAQ'
+        verbose_name_plural = 'FAQ'
+
+    def __str__(self):
+        return f'{self.question[:50]}...'

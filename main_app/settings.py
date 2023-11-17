@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     "phonenumber_field",
     'storages',
+    'tinymce',
 ]
 
 MIDDLEWARE = [
