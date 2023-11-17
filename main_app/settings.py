@@ -69,9 +69,7 @@ DATABASES = {
 }
 
 
-AUTH_PASSWORD_VALIDATORS = [
-
-]
+AUTH_PASSWORD_VALIDATORS = []
 
 AUTH_USER_MODEL = 'storages.CustomUser'
 
