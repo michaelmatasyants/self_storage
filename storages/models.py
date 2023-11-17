@@ -19,6 +19,8 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Клиенты'
 
 
+
+
 class Storage(models.Model):
     title = models.CharField('Склад', max_length=100)
     city = models.CharField('Город', max_length=100)
