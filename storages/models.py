@@ -33,6 +33,7 @@ class Storage(models.Model):
         return f'{self.title} адрес: {self.city} {self.address}'
 
 
+
 class BoxType(models.Model):
     length = models.FloatField('Длина')
     width = models.FloatField('Ширина')
