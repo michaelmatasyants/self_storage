@@ -53,19 +53,17 @@ def login_user(request):
 
 def register_user(request, *args, **kwargs):
     if request.method == 'POST':
-        print(request.POST)
         form = RegistrationForm(request.POST)
         if form.is_valid():
-
             form.save()
             user = authenticate(
                 request,
-                email=form.cleaned_data.get('email'),
+                username=form.cleaned_data.get('username'),
                 password=form.cleaned_data.get('password1'),
             )
-            user = form.cleaned_data.get('email')
-            print(type(user), user)
-            login(request, user)
+            # user = form.cleaned_data.get('email')
+            if user:
+                login(request, user)
             # destination = kwargs.get("next")
             # if destination:
             #     return redirect(destination)
