@@ -81,8 +81,8 @@ def index(request):
         'registration_form': RegistrationForm(),
     }
     nearest_storage = Storage.objects.first()
-    context['nearest_storage'] = serialize_storage(nearest_storage)
-                                 if nearest_storage else None
+    context['nearest_storage'] = (serialize_storage(nearest_storage)
+                                 if nearest_storage else None)
     return render(request, 'index.html', context=context)
 
 
