@@ -16,4 +16,5 @@ urlpatterns = [
         LogoutView.as_view(next_page=settings.LOGOUT_REDIRECT_URL),
         name="logout",
     ),
+    path('send_mail/', views.send_payment_link, name='send_mail'),
 ]

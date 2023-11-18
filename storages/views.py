@@ -1,15 +1,21 @@
-from django.shortcuts import render, redirect
+from datetime import datetime, timedelta
+
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Prefetch, Count
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
+from storages.funcs import get_html_message
 from storages.models import CustomUser, Storage, Box, Order, FAQ, BoxType
 
 
 def serialize_storage(storage: Storage):
     return {
+        'id': storage.id,
         'city': storage.city,
         'address': storage.address,
         'temp': str(storage.temp),
@@ -49,7 +55,8 @@ def login_user(request):
                 form.add_error(None, ValidationError("Неверный email или пароль."))
     else:
         form = LoginForm()
-    return render(request, "aside/login.html", {"form": form})
+    # return render(request, "aside/login.html", {"form": form})
+    return redirect('login')
 
 
 def register_user(request, *args, **kwargs):
@@ -67,7 +74,8 @@ def register_user(request, *args, **kwargs):
             return redirect("index")
     else:
         form = RegistrationForm()
-    return render(request, 'aside/registration.html', {form: form})
+    # return render(request, 'aside/registration.html', {form: form})
+    return redirect('register')
 
 
 def index(request):
@@ -121,3 +129,44 @@ def show_faq(request):
         ]
     }
     return render(request, 'faq.html', context=context)
+
+
+def send_payment_link(request):
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        box_type = get_object_or_404(
+            BoxType,
+            id=int(request.POST.get('box_type'))
+        )
+        storage = get_object_or_404(
+            Storage,
+            id=int(request.POST.get('storage'))
+        )
+
+        box = Box.objects.filter(box_type=box_type,
+                                 storage=storage,
+                                 is_free=True).first()
+        box.is_free = False
+        box.save()
+        
+        order = Order.objects.create(client=request.user, box=box)
+        serialize_order = {
+            '[номер заказа]': order.id,
+            '[адрес склада]': f'г. {storage.city}, {storage.address}',
+            '[номер бокса]': box.id,
+            '[размер бокса]': box_type,
+            '[стоимость]': box_type.price
+        }
+
+        email = request.user.email
+        mail = EmailMessage(
+            'Оплата аренды бокса',
+            'обычный текст',
+            recipient_list=[email],
+            html_message=get_html_message(serialize_order),
+            fail_silently=False
+        )
+        mail.send()
+    return redirect('index')
