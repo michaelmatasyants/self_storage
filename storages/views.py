@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
 
 from storages.backends import EmailBackend
-from storages.forms import LoginForm
+from storages.forms import LoginForm, RegistrationForm
 from storages.models import CustomUser, Storage, Box, Order, FAQ, BoxType
 
 
@@ -49,14 +49,35 @@ def login_user(request):
                 form.add_error(None, ValidationError("Неверный email или пароль."))
     else:
         form = LoginForm()
-    return render(request, "index.html", {"form": form})
+    return render(request, "aside/login.html", {"form": form})
+
+
+def register_user(request, *args, **kwargs):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = authenticate(
+                request,
+                username=form.cleaned_data.get('username'),
+                password=form.cleaned_data.get('password1'),
+            )
+            if user:
+                login(request, user)
+            return redirect("index")
+    else:
+        form = RegistrationForm()
+    return render(request, 'aside/registration.html', {form: form})
 
 
 def index(request):
-    nearest_storage = Storage.objects.first()
     context = {
-        'nearest_storage': serialize_storage(nearest_storage)
+        'login_form': LoginForm(),
+        'registration_form': RegistrationForm(),
     }
+    nearest_storage = Storage.objects.first()
+    context['nearest_storage'] = (serialize_storage(nearest_storage)
+                                 if nearest_storage else None)
     return render(request, 'index.html', context=context)
 
 
