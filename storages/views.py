@@ -103,6 +103,7 @@ def choose_boxes(request):
 
 
 # не дописан
+@login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
 
