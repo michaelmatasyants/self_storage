@@ -49,7 +49,7 @@ class RegistrationForm(UserCreationForm):
             }
         )
     )
-    phonenumber = PhoneNumberField(
+    phone = PhoneNumberField(
         widget=forms.TextInput(
             attrs={
                 "class": "form-control border-8 mb-2 py-2 px-3 border-0 fs_24 " "SelfStorage__bg_lightgrey",
@@ -78,7 +78,7 @@ class RegistrationForm(UserCreationForm):
             "email",
             "first_name",
             "last_name",
-            "phonenumber",
+            "phone",
             "password1",
             "password2",
         )

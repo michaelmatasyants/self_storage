@@ -32,6 +32,7 @@ def serialize_faq(question: FAQ):
         'answer': question.answer,
     }
 
+
 def login_user(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
