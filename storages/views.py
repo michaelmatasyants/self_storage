@@ -49,7 +49,7 @@ def login_user(request):
                 form.add_error(None, ValidationError("Неверный email или пароль."))
     else:
         form = LoginForm()
-    return render(request, "aside/login.html", {"form": form})
+    return render(request, "reg_log_forms/login.html", {"form": form})
 
 
 def register_user(request, *args, **kwargs):
@@ -67,7 +67,7 @@ def register_user(request, *args, **kwargs):
             return redirect("index")
     else:
         form = RegistrationForm()
-    return render(request, 'aside/registration.html', {form: form})
+    return render(request, 'reg_log_forms/register.html', {'form': form})
 
 
 def index(request):
