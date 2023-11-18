@@ -60,7 +60,9 @@ class Box(models.Model):
     is_free = models.BooleanField('Статус', default=True)
     box_type = models.ForeignKey(BoxType,
                                  on_delete=models.CASCADE,
-                                 related_name='boxes')
+                                 related_name='boxes',
+                                 default=None,
+                                 )
     storage = models.ForeignKey(Storage,
                                 on_delete=models.CASCADE,
                                 related_name='boxes',

@@ -79,7 +79,9 @@ LOGOUT_REDIRECT_URL = "/"
 
 AUTHENTICATION_BACKENDS = ['storages.backends.EmailBackend']
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
+
+PHONE_NUMBER_REGION = 'RU'
 
 TIME_ZONE = 'Europe/Moscow'
 

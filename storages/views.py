@@ -32,6 +32,7 @@ def serialize_faq(question: FAQ):
         'answer': question.answer,
     }
 
+
 def login_user(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -61,12 +62,8 @@ def register_user(request, *args, **kwargs):
                 username=form.cleaned_data.get('username'),
                 password=form.cleaned_data.get('password1'),
             )
-            # user = form.cleaned_data.get('email')
             if user:
                 login(request, user)
-            # destination = kwargs.get("next")
-            # if destination:
-            #     return redirect(destination)
             return redirect("index")
     else:
         form = RegistrationForm()

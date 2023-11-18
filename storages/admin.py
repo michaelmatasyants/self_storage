@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from storages.models import CustomUser, Storage, Box, Order
+from storages.models import CustomUser, Storage, Box, Order, BoxType
 
 
 @admin.register(CustomUser)
@@ -20,4 +20,9 @@ class BoxAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(BoxType)
+class BoxTypeAdmin(admin.ModelAdmin):
     pass
