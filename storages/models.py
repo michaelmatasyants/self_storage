@@ -7,11 +7,15 @@ from tinymce.models import HTMLField
 
 
 class CustomUser(AbstractUser):
-    # username = models.CharField('Имя пользователя', max_length=200, unique=True)
+    username = models.CharField('Имя пользователя', max_length=200, unique=True)
     email = models.EmailField('Почта', unique=True)
     phone = PhoneNumberField('Телефон', null=True, blank=True)
     first_name = models.CharField('Имя', max_length=100, null=True, blank=True)
-    last_name = models.CharField('Имя', max_length=100, null=True, blank=True)
+    last_name = models.CharField('Фамилия', max_length=100, null=True, blank=True)
+
+    # USERNAME_FIELD = "email"
+    # EMAIL_FIELD = "email"
+    # REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = 'Клиент'
@@ -54,7 +58,9 @@ class Box(models.Model):
     is_free = models.BooleanField('Статус', default=True)
     box_type = models.ForeignKey(BoxType,
                                  on_delete=models.CASCADE,
-                                 related_name='boxes')
+                                 related_name='boxes',
+                                 default=None,
+                                 )
     storage = models.ForeignKey(Storage,
                                 on_delete=models.CASCADE,
                                 related_name='boxes',
