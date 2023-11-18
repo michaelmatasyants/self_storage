@@ -1,8 +1,7 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-
 from decimal import Decimal
 
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from tinymce.models import HTMLField
 
@@ -19,8 +18,6 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Клиенты'
 
 
-
-
 class Storage(models.Model):
     title = models.CharField('Склад', max_length=100)
     city = models.CharField('Город', max_length=100)
@@ -33,7 +30,7 @@ class Storage(models.Model):
         verbose_name_plural = 'Склады'
 
     def __str__(self):
-        return f'self.title адрес: self.city self.address'
+        return f'{self.title} адрес: {self.city} {self.address}'
 
 
 class BoxType(models.Model):
@@ -50,7 +47,6 @@ class BoxType(models.Model):
 
     def __str__(self):
         return f'Бокс {self.length}м х {self.width}м х {self.height}м'
-
 
 
 class Box(models.Model):

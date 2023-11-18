@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
-from django.db.models import Prefetch, Count
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
+from django.db.models import Count, Prefetch
+from django.shortcuts import redirect, render
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm
-from storages.models import CustomUser, Storage, Box, Order, FAQ, BoxType
+from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
 
 def serialize_storage(storage: Storage):
