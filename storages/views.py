@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.db.models import Prefetch, Count
 from django.contrib.auth import authenticate, login
@@ -64,7 +65,7 @@ def register_user(request, *args, **kwargs):
             )
             if user:
                 login(request, user)
-            return redirect("index")
+            return redirect("/")
     else:
         form = RegistrationForm()
     return render(request, 'reg_log_forms/register.html', {'form': form})
@@ -116,7 +117,7 @@ def show_personal_account(request):
 
 
 def show_faq(request):
-    context={
+    context = {
         'questions': [
             serialize_faq(question) for question in FAQ.objects.all()
         ]
