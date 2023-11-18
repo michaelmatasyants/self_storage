@@ -65,7 +65,7 @@ def register_user(request, *args, **kwargs):
             )
             if user:
                 login(request, user)
-            return redirect("/")
+            return redirect("index")
     else:
         form = RegistrationForm()
     return render(request, 'reg_log_forms/register.html', {'form': form})
