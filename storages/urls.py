@@ -17,5 +17,5 @@ urlpatterns = [
         name="logout",
     ),
     path('send_mail/', views.send_payment_link, name='send_mail'),
-    path('payment/', views.payment, name='payment'),
+    # path('payment/', views.payment, name='payment'),
 ]
