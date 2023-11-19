@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
-from django.db.models import Prefetch, Count
-from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count, Prefetch
+from django.shortcuts import get_object_or_404, redirect, render
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
@@ -29,6 +29,20 @@ def serialize_user(user: CustomUser):
         'last_name': user.last_name,
         'email': user.email,
         'phone': user.phone,
+    }
+
+
+def serialize_order(order: Order):
+    days_left = order.paid_till.date() - datetime.now().date()
+    time_to_pay = True if days_left < timedelta(days=7) else False
+    paid_from = order.paid_from.strftime('%d.%m.%Y')
+    paid_till = order.paid_till.strftime('%d.%m.%Y')
+    return {
+        'box_id': order.box.id,
+        'storage_id': order.box.storage.id,
+        'storage_address': order.box.storage.__str__(),
+        'paid_for_period': f'{paid_from} - {paid_till}',
+        'time_to_pay': time_to_pay,
     }
 
 
@@ -58,7 +72,7 @@ def login_user(request):
     return render(request, "reg_log_forms/login.html", {"form": form})
 
 
-def register_user(request, *args, **kwargs):
+def register_user(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -117,15 +131,14 @@ def choose_boxes(request):
     return render(request, 'boxes.html', context=context)
 
 
-# не дописан
 @login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
 
-    orders = user.orders.all()
+    orders = user.orders.select_related('box').all()
     context = {
         'user': serialize_user(user),
-        'orders': orders
+        'orders': [serialize_order(order) for order in orders]
     }
     return render(request, 'my-rent.html', context=context)
 

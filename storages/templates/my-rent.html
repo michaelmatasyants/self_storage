@@ -66,11 +66,13 @@
 					<h1 class="fw-bold SelfStorage_green mb-5">Добрый день, Екатерина!</h1>
 					{% if orders %}
 					  <a href="#" class="SelfStorage_orange">История аренды</a>
-					  <h4 class="SelfStorage_grey my-3">Срок Вашей аренды подходит к концу :(<br>Вы можете продлить аренду или забрать вещи до 28 июня 2022 года включительно.</h4>
-					  {% for ind, order in enumerate(orders) %}
+					  {% for order in orders %}
+					  	{% if order %}
+						{% endif %}
+					    <h4 class="SelfStorage_grey my-3">Срок Вашей аренды подходит к концу :(<br>Вы можете продлить аренду или забрать вещи до 28 июня 2022 года включительно.</h4>
 					    <div class="mb-5">
 					      <!-- Мой склад №1 -->
-					      <h4 class="SelfStorage_green">Склад: {{ order.storage }}</h4>
+					      <h4 class="SelfStorage_green">Склад: №{{ order.storage_id }}</h4>
 					      <!-- Одинцово, ул. Северная, д. 36 -->
 					      <h4>{{ order.storage_address }}</h4>
 					      <h4 class="SelfStorage_green">Мой бокс</h4>
