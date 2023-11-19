@@ -67,9 +67,9 @@
 					{% if orders %}
 					  <a href="#" class="SelfStorage_orange">История аренды</a>
 					  {% for order in orders %}
-					  	{% if order %}
+					  	{% if order.time_to_pay %}
+						  <h4 class="SelfStorage_grey my-3">Срок Вашей аренды подходит к концу :(<br>Вы можете продлить аренду или забрать вещи до 28 июня 2022 года включительно.</h4>
 						{% endif %}
-					    <h4 class="SelfStorage_grey my-3">Срок Вашей аренды подходит к концу :(<br>Вы можете продлить аренду или забрать вещи до 28 июня 2022 года включительно.</h4>
 					    <div class="mb-5">
 					      <!-- Мой склад №1 -->
 					      <h4 class="SelfStorage_green">Склад: №{{ order.storage_id }}</h4>
