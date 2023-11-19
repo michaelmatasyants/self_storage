@@ -1,16 +1,21 @@
+from datetime import datetime, timedelta
+
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
 from django.db.models import Count, Prefetch
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
+from storages.funcs import get_html_message
 from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
 
 def serialize_storage(storage: Storage):
     return {
+        'id': storage.id,
         'city': storage.city,
         'address': storage.address,
         'temp': str(storage.temp),
@@ -138,3 +143,44 @@ def show_faq(request):
         ]
     }
     return render(request, 'faq.html', context=context)
+
+
+def send_payment_link(request):
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        box_type = get_object_or_404(
+            BoxType,
+            id=int(request.POST.get('box_type'))
+        )
+        storage = get_object_or_404(
+            Storage,
+            id=int(request.POST.get('storage'))
+        )
+
+        box = Box.objects.filter(box_type=box_type,
+                                 storage=storage,
+                                 is_free=True).first()
+        box.is_free = False
+        box.save()
+
+        order = Order.objects.create(client=request.user, box=box)
+        serialize_order = {
+            '[номер заказа]': order.id,
+            '[адрес склада]': f'г. {storage.city}, {storage.address}',
+            '[номер бокса]': box.id,
+            '[размер бокса]': box_type,
+            '[стоимость]': box_type.price
+        }
+
+        email = request.user.email
+        mail = EmailMessage(
+            'Оплата аренды бокса',
+            'обычный текст',
+            recipient_list=[email],
+            html_message=get_html_message(serialize_order),
+            fail_silently=False
+        )
+        mail.send()
+    return redirect('index')
