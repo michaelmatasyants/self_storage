@@ -95,7 +95,7 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return f'self.client бокс: self.box'
+        return f'{self.client} бокс: {self.box}'
 
 
 class FAQ(models.Model):
