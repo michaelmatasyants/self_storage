@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch, Count
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
@@ -55,8 +56,7 @@ def login_user(request):
                 form.add_error(None, ValidationError("Неверный email или пароль."))
     else:
         form = LoginForm()
-    # return render(request, "aside/login.html", {"form": form})
-    return redirect('login')
+    return render(request, "reg_log_forms/login.html", {"form": form})
 
 
 def register_user(request, *args, **kwargs):
@@ -74,8 +74,7 @@ def register_user(request, *args, **kwargs):
             return redirect("index")
     else:
         form = RegistrationForm()
-    # return render(request, 'aside/registration.html', {form: form})
-    return redirect('register')
+    return render(request, 'reg_log_forms/register.html', {'form': form})
 
 
 def index(request):
@@ -111,6 +110,7 @@ def choose_boxes(request):
 
 
 # не дописан
+@login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
 
@@ -123,7 +123,7 @@ def show_personal_account(request):
 
 
 def show_faq(request):
-    context={
+    context = {
         'questions': [
             serialize_faq(question) for question in FAQ.objects.all()
         ]
