@@ -153,7 +153,7 @@ def send_payment_link(request):
                                  is_free=True).first()
         box.is_free = False
         box.save()
-        
+
         order = Order.objects.create(client=request.user, box=box)
         serialize_order = {
             '[номер заказа]': order.id,
