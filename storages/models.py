@@ -34,7 +34,7 @@ class Storage(models.Model):
         verbose_name_plural = 'Склады'
 
     def __str__(self):
-        return f'{self.title} адрес: {self.city} {self.address}'
+        return f'г. {self.city}, {self.address}'
 
 
 class BoxType(models.Model):
