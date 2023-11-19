@@ -101,7 +101,7 @@ def choose_boxes(request):
         serialize_storages.append({
             'storage': serialize_storage(storage),
             'free_boxes_count': free_boxes.count(),
-            'storage_box_types': storage_box_types
+            'storage_box_types': storage_box_types,
         })
 
     context = {
