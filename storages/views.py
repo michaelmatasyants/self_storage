@@ -88,7 +88,6 @@ def index(request):
 
 
 def choose_boxes(request):
-    boxes_count
     storages = Storage.objects.prefetch_related(
         Prefetch('boxes', queryset=Box.objects.filter(is_free=True))
     )
@@ -99,8 +98,10 @@ def choose_boxes(request):
         if not free_boxes:
             continue
 
-        storage_box_types = free_boxes.values('box_type').distinct()
-        min_price = min(storage_box_types, key=lambda x: x['price'])['price']
+        box_type_ids = free_boxes.values('box_type').distinct()
+        storage_box_types = BoxType.objects.filter(id__in=box_type_ids)
+        min_price = min(storage_box_types, key=lambda x: x.price).price
+        print(min_price)
         serialize_storages.append({
             'storage': serialize_storage(storage),
             'free_boxes_count': free_boxes.count(),
