@@ -104,7 +104,11 @@ def choose_boxes(request):
             'storage_box_types': storage_box_types
         })
 
-    context = {'storages': serialize_storages}
+    context = {
+        'storages': serialize_storages,
+        'login_form': LoginForm(),
+        'registration_form': RegistrationForm(),
+    }
     return render(request, 'boxes.html', context=context)
 
 
