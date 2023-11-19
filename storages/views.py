@@ -114,9 +114,18 @@ def show_personal_account(request):
     user = request.user
 
     orders = user.orders.all()
+    serialized_orders = []
+    for order in orders:
+        serialized_orders.append({
+            'order': order,
+            'box_id': order.box.id,
+            'storage': order.box.storage,
+            'storage_address': order.box.storage.address,
+            'paid_for_period': f'{order.paid_from} - {order.paid_till}',
+        })
     context = {
         'user': serialize_user(user),
-        'orders': orders
+        'orders': serialized_orders,
     }
     return render(request, 'my-rent.html', context=context)
 
