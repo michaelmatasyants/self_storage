@@ -1,11 +1,11 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db.models import Count, Prefetch
 from django.shortcuts import redirect, render
 
 from storages.backends import EmailBackend
-from storages.forms import LoginForm
+from storages.forms import LoginForm, RegistrationForm
 from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
 
@@ -96,10 +96,14 @@ def choose_boxes(request):
         serialize_storages.append({
             'storage': serialize_storage(storage),
             'free_boxes_count': free_boxes.count(),
-            'storage_box_types': storage_box_types
+            'storage_box_types': storage_box_types,
         })
 
-    context = {'storages': serialize_storages}
+    context = {
+        'storages': serialize_storages,
+        'login_form': LoginForm(),
+        'registration_form': RegistrationForm()
+    }
     return render(request, 'boxes.html', context=context)
 
 
@@ -114,9 +118,11 @@ def show_personal_account(request):
         serialized_orders.append({
             'order': order,
             'box_id': order.box.id,
-            'storage': order.box.storage,
+            'storage_id': order.box.storage.id,
             'storage_address': order.box.storage.address,
             'paid_for_period': f'{order.paid_from} - {order.paid_till}',
+            # Добавить оповещать за неделю до
+            'time_to_pay': True if order.paid_till else False,
         })
     context = {
         'user': serialize_user(user),
