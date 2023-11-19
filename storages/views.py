@@ -1,7 +1,37 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.db.models import Prefetch, Count
+from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
+
+from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
+from storages.models import CustomUser, Storage, Box, Order, FAQ, BoxType
+
+
+def serialize_storage(storage: Storage):
+    return {
+        'city': storage.city,
+        'address': storage.address,
+        'temp': str(storage.temp),
+        'photo': storage.photo.url,
+    }
+
+
+def serialize_user(user: CustomUser):
+    return {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'phone': user.phone,
+    }
+
+
+def serialize_faq(question: FAQ):
+    return {
+        'question': question.question,
+        'answer': question.answer,
+    }
 
 
 def login_user(request):
@@ -20,53 +50,76 @@ def login_user(request):
                 form.add_error(None, ValidationError("Неверный email или пароль."))
     else:
         form = LoginForm()
-    return render(request, "aside/login.html", {"form": form})
+    return render(request, "reg_log_forms/login.html", {"form": form})
 
 
 def register_user(request, *args, **kwargs):
     if request.method == 'POST':
-        print(request.POST)
         form = RegistrationForm(request.POST)
         if form.is_valid():
-
             form.save()
             user = authenticate(
                 request,
-                email=form.cleaned_data.get('email'),
+                username=form.cleaned_data.get('username'),
                 password=form.cleaned_data.get('password1'),
             )
-            user = form.cleaned_data.get('email')
-            print(type(user), user)
-            login(request, user)
-            # destination = kwargs.get("next")
-            # if destination:
-            #     return redirect(destination)
+            if user:
+                login(request, user)
             return redirect("index")
     else:
         form = RegistrationForm()
-    return render(request, 'aside/registration.html', {form: form})
+    return render(request, 'reg_log_forms/register.html', {'form': form})
 
 
 def index(request):
-    '''Main_page view'''
-
     context = {
         'login_form': LoginForm(),
         'registration_form': RegistrationForm(),
     }
-    return render(request, 'index.html', context)
+    nearest_storage = Storage.objects.first()
+    context['nearest_storage'] = (serialize_storage(nearest_storage)
+                                 if nearest_storage else None)
+    return render(request, 'index.html', context=context)
 
 
-def faq(request):
-    '''FAQ view'''
-    return render(request, 'faq.html')
+def choose_boxes(request):
+    storages = Storage.objects.prefetch_related(
+        Prefetch('boxes', queryset=Box.objects.filter(is_free=True))
+    )
+    serialize_storages = []
+    for storage in storages:
+        free_boxes = storage.boxes.all()
+        if not free_boxes:
+            continue
+
+        storage_box_types = free_boxes.values('box_type').distinct()
+        serialize_storages.append({
+            'storage': serialize_storage(storage),
+            'free_boxes_count': free_boxes.count(),
+            'storage_box_types': storage_box_types
+        })
+
+    context = {'storages': serialize_storages}
+    return render(request, 'boxes.html', context=context)
 
 
-def boxes(request):
-    '''Boxes view'''
-    return render(request, 'boxes.html')
+# не дописан
+@login_required(login_url="login")
+def show_personal_account(request):
+    user = request.user
+
+    orders = user.orders.all()
+    context = {
+        'user': serialize_user(user),
+        'orders': orders
+    }
+    return render(request, 'my-rent.html', context=context)
 
 
-def my_rent(request):
-    '''My rent view'''
-    return render(request, 'my-rent.html')
+def show_faq(request):
+    context = {
+        'questions': [
+            serialize_faq(question) for question in FAQ.objects.all()
+        ]
+    }
+    return render(request, 'faq.html', context=context)

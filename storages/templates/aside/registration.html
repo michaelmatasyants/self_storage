@@ -10,11 +10,11 @@
                     class="d-flex flex-column align-items-center" style="max-width: 420px">
                     <h1 class="modal-title text-center fw-bold mb-3">Регистрация</h1>
                     {% csrf_token %}
-                    {{ refistration_form.username }}
+                    {{ registration_form.username }}
                     {{ registration_form.email }}
                     {{ registration_form.first_name }}
                     {{ registration_form.last_name }}
-                    {{ registration_form.phonenumber }}
+                    {{ registration_form.phone }}
                     {{ registration_form.password1 }}
                     {{ registration_form.password2 }}
 
@@ -23,7 +23,7 @@
                             class="SelfStorage_grey">согласие на обработку персональных данных</a></span>
                     <button
                         class="btn border-8 py-3 px-5 mt-5 mb-3 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange">Зарегистрироваться</button>
-                    <span>Уже зарегистрированы? <a href="#" class="SelfStorage_orange" data-bs-toggle="modal"
+                    <span>Уже зарегистрированы? <a href="{% url 'login' %}" class="SelfStorage_orange" data-bs-toggle="modal"
                             data-bs-target="#SignModal" data-bs-dismiss="modal" aria-label="Close">Войти в личный
                             кабинет</a></span>
                 </form>

@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     "phonenumber_field",
     'storages',
+    'tinymce',
 ]
 
 MIDDLEWARE = [
@@ -44,7 +45,7 @@ ROOT_URLCONF = 'main_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'storages', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -63,7 +64,7 @@ WSGI_APPLICATION = 'main_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -73,10 +74,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'storages.CustomUser'
+
 LOGOUT_REDIRECT_URL = "/"
+
 AUTHENTICATION_BACKENDS = ['storages.backends.EmailBackend']
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
+
+PHONE_NUMBER_REGION = 'RU'
 
 TIME_ZONE = 'Europe/Moscow'
 
