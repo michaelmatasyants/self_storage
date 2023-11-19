@@ -1,11 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
-from django.db.models import Prefetch, Count
-from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count, Prefetch
+from django.shortcuts import get_object_or_404, redirect, render
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
@@ -101,14 +101,17 @@ def choose_boxes(request):
         serialize_storages.append({
             'storage': serialize_storage(storage),
             'free_boxes_count': free_boxes.count(),
-            'storage_box_types': storage_box_types
+            'storage_box_types': storage_box_types,
         })
 
-    context = {'storages': serialize_storages}
+    context = {
+        'storages': serialize_storages,
+        'login_form': LoginForm(),
+        'registration_form': RegistrationForm()
+    }
     return render(request, 'boxes.html', context=context)
 
 
-# не дописан
 @login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
@@ -116,12 +119,16 @@ def show_personal_account(request):
     orders = user.orders.all()
     serialized_orders = []
     for order in orders:
+        time_to_pay = False
+        if order.paid_till.date() - datetime.now().date() < timedelta(days=7):
+            time_to_pay = True
         serialized_orders.append({
             'order': order,
             'box_id': order.box.id,
-            'storage': order.box.storage,
+            'storage_id': order.box.storage.id,
             'storage_address': order.box.storage.address,
-            'paid_for_period': f'{order.paid_from} - {order.paid_till}',
+            'paid_for_period': f'С {order.paid_from.date()} по {order.paid_till.date()}',
+            'time_to_pay': time_to_pay,
         })
     context = {
         'user': serialize_user(user),
