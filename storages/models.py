@@ -80,6 +80,7 @@ class Order(models.Model):
                                on_delete=models.CASCADE,
                                related_name='orders',
                                verbose_name='Клиент',
+                               null=True
                                )
     box = models.ForeignKey(Box,
                             on_delete=models.CASCADE,
