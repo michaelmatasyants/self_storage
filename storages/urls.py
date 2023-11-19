@@ -11,7 +11,10 @@ urlpatterns = [
     path('my_rent/', views.show_personal_account, name='my_rent'),
     path('login/', views.login_user, name='login'),
     path('register/', views.register_user, name='register'),
-    path('logout',
-         LogoutView.as_view(next_page=settings.LOGOUT_REDIRECT_URL),
-         name='logout'),
+    path(
+        "logout",
+        LogoutView.as_view(next_page=settings.LOGOUT_REDIRECT_URL),
+        name="logout",
+    ),
+    path('send_mail/', views.send_payment_link, name='send_mail'),
 ]

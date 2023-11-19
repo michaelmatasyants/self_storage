@@ -8,6 +8,8 @@ env.read_env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SELF_STORAGE_URL = env.str('SELF_STORAGE_URL')
+
 SECRET_KEY = env.str('SECRET_KEY')
 
 DEBUG = True
@@ -79,6 +81,20 @@ LOGOUT_REDIRECT_URL = "/"
 
 AUTHENTICATION_BACKENDS = ['storages.backends.EmailBackend']
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.yandex.ru'
+
+EMAIL_PORT = 465
+
+EMAIL_USE_SSL = True
+
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')
+
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
+
+DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL')
+
 LANGUAGE_CODE = 'ru-ru'
 
 PHONE_NUMBER_REGION = 'RU'
@@ -92,6 +108,10 @@ USE_TZ = True
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+
+TINYMCE_DEFAULT_CONFIG = {
+    'content_css': STATIC_ROOT,
+}
 
 STATIC_URL = '/static/'
 
