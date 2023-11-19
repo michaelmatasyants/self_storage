@@ -1,17 +1,16 @@
 from datetime import datetime, timedelta
 
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch, Count
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
 from django.core.mail import EmailMessage
+from django.db.models import Prefetch, Count
+from django.shortcuts import render, redirect, get_object_or_404
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
 from storages.funcs import get_html_message
-from storages.models import CustomUser, Storage, Box, Order, FAQ, BoxType
+from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
 
 def serialize_storage(storage: Storage):
