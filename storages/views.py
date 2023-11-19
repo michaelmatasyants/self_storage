@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -112,7 +112,6 @@ def choose_boxes(request):
     return render(request, 'boxes.html', context=context)
 
 
-# не дописан
 @login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
@@ -120,14 +119,16 @@ def show_personal_account(request):
     orders = user.orders.all()
     serialized_orders = []
     for order in orders:
+        time_to_pay = False
+        if order.paid_till.date() - datetime.now().date() < timedelta(days=7):
+            time_to_pay = True
         serialized_orders.append({
             'order': order,
             'box_id': order.box.id,
             'storage_id': order.box.storage.id,
             'storage_address': order.box.storage.address,
-            'paid_for_period': f'{order.paid_from} - {order.paid_till}',
-            # Добавить оповещать за неделю до
-            'time_to_pay': True if order.paid_till else False,
+            'paid_for_period': f'С {order.paid_from.date()} по {order.paid_till.date()}',
+            'time_to_pay': time_to_pay,
         })
     context = {
         'user': serialize_user(user),
