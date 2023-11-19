@@ -135,7 +135,7 @@ def choose_boxes(request):
 def show_personal_account(request):
     user = request.user
 
-    orders = user.orders.select_related('box').all()
+    orders = user.orders.filter(is_open=True).select_related('box')
     context = {
         'user': serialize_user(user),
         'orders': [serialize_order(order) for order in orders]
