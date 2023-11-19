@@ -109,7 +109,11 @@ def choose_boxes(request):
             'storage_box_types': storage_box_types
         })
 
-    context = {'storages': serialize_storages}
+    context = {
+        'storages': serialize_storages,
+        'login_form': LoginForm(),
+        'registration_form': RegistrationForm()
+    }
     return render(request, 'boxes.html', context=context)
 
 
@@ -119,18 +123,9 @@ def show_personal_account(request):
     user = request.user
 
     orders = user.orders.all()
-    serialized_orders = []
-    for order in orders:
-        serialized_orders.append({
-            'order': order,
-            'box_id': order.box.id,
-            'storage': order.box.storage,
-            'storage_address': order.box.storage.address,
-            'paid_for_period': f'{order.paid_from} - {order.paid_till}',
-        })
     context = {
         'user': serialize_user(user),
-        'orders': serialized_orders,
+        'orders': orders
     }
     return render(request, 'my-rent.html', context=context)
 
@@ -163,7 +158,7 @@ def send_payment_link(request):
                                  is_free=True).first()
         box.is_free = False
         box.save()
-        
+
         order = Order.objects.create(client=request.user, box=box)
         serialize_order = {
             '[номер заказа]': order.id,
