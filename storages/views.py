@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.db.models import Prefetch, Count
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
+from django.db.models import Count, Prefetch
+from django.shortcuts import redirect, render
 
 from storages.backends import EmailBackend
-from storages.forms import LoginForm, RegistrationForm
-from storages.models import CustomUser, Storage, Box, Order, FAQ, BoxType
+from storages.forms import LoginForm
+from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
 
 def serialize_storage(storage: Storage):
@@ -109,9 +109,18 @@ def show_personal_account(request):
     user = request.user
 
     orders = user.orders.all()
+    serialized_orders = []
+    for order in orders:
+        serialized_orders.append({
+            'order': order,
+            'box_id': order.box.id,
+            'storage': order.box.storage,
+            'storage_address': order.box.storage.address,
+            'paid_for_period': f'{order.paid_from} - {order.paid_till}',
+        })
     context = {
         'user': serialize_user(user),
-        'orders': orders
+        'orders': serialized_orders,
     }
     return render(request, 'my-rent.html', context=context)
 

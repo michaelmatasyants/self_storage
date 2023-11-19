@@ -140,17 +140,14 @@ body {
     background-color: #F28A4F !important;
 }
 .mt-header {
-    padding-top: calc(136px + 1.6rem);
+    margin-top: calc(136px + 1.6rem);
 }
 .pt-header {
-    margin-top: calc(136px + 1.6rem);
+    padding-top: calc(136px + 1.6rem);
 }
 .SelfStorage__input {
 
 }
 .z-index-1 {
     z-index: -1;
-}
-.tab-content {
-    margin-bottom: calc(136px + 1.6rem);
 }
