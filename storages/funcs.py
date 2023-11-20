@@ -10,11 +10,14 @@ def get_html_message(order: dict):
     with open(filepath, 'r') as file:
         message = file.read()
 
-    # создать ссылку на оплату
+    confirmation_url = get_payment_link(
+        order['[стоимость]'],
+        f'Оплата заказа {order['[номер заказа]']}'
+    )
 
     replacements = {
         '[ссылка на сайт]': SELF_STORAGE_URL,
-        '[ссылка на оплату]': '',
+        '[ссылка на оплату]': confirmation_url,
         '[ссылка на правила]': '',
     }
     replacements.update(order)
