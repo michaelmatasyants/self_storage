@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
-from storages.funcs import get_html_message
+from storages.funcs import get_html_message, get_payment_link
 from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
 
@@ -172,7 +172,8 @@ def send_payment_link(request):
             '[адрес склада]': f'г. {storage.city}, {storage.address}',
             '[номер бокса]': box.id,
             '[размер бокса]': box_type,
-            '[стоимость]': box_type.price
+            '[стоимость]': box_type.price,
+            '[ссылка на оплату]': get_payment_link(box_type.price, f'оплата заказа {{order.id}}'),
         }
 
         email = request.user.email
