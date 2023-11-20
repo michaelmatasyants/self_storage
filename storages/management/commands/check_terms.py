@@ -117,7 +117,7 @@ class Command(BaseCommand):
     help = 'проверка сроков оплаты и рассылка уведомлений'
 
     def handle(self, *args, **options):
-        schedule.every().day.at('13:12', 'Europe/Moscow').do(check_terms)
+        schedule.every().day.at('00:00', 'Europe/Moscow').do(check_terms)
         while True:
             schedule.run_pending()
             time.sleep(1)
