@@ -11,6 +11,8 @@ from storages.forms import LoginForm, RegistrationForm
 from storages.funcs import get_html_message
 from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
+from django.conf import settings
+
 
 def serialize_storage(storage: Storage):
     return {
@@ -188,3 +190,5 @@ def send_payment_link(request):
         )
         mail.send(fail_silently=True, timeout=10)
     return redirect('index')
+
+
