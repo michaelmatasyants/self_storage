@@ -55,7 +55,7 @@ class BoxType(models.Model):
 
 class Box(models.Model):
     title = models.CharField('Бокс', max_length=100)
-    is_free = models.BooleanField('Статус', default=True)
+    is_free = models.BooleanField('Свободен', default=True)
     box_type = models.ForeignKey(BoxType,
                                  on_delete=models.CASCADE,
                                  related_name='boxes',
