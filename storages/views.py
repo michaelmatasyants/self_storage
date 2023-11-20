@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db.models import Count, Prefetch
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -19,6 +20,7 @@ def serialize_storage(storage: Storage):
         'address': storage.address,
         'temp': str(storage.temp),
         'photo': storage.photo.url,
+        'boxes': storage.boxes.all(),
     }
 
 
@@ -127,6 +129,20 @@ def choose_boxes(request):
         'login_form': LoginForm(),
         'registration_form': RegistrationForm()
     }
+
+    if request.method == 'POST':
+        if 'action' in request.POST:
+            action = request.POST['action']
+            if action == 'rent_box':
+                new_order = Order(
+                    client=request.user,
+                    box=Box.objects.get(pk=1),
+                    paid_date=timezone.now(),
+                    paid_from=timezone.now(),
+                    paid_till=timezone.now(),
+                )
+                new_order.save()
+
     return render(request, 'boxes.html', context=context)
 
 
