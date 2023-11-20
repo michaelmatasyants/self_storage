@@ -12,7 +12,7 @@ def get_html_message(order: dict):
 
     confirmation_url = get_payment_link(
         order['[стоимость]'],
-        f'Оплата заказа {order['[номер заказа]']}'
+        f'Оплата заказа {order["[номер заказа]"]}'
     )
 
     replacements = {
