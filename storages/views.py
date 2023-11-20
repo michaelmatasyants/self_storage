@@ -1,11 +1,10 @@
-from datetime import date, datetime, timedelta
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db.models import Count, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
@@ -33,8 +32,8 @@ def serialize_user(user: CustomUser):
 
 
 def serialize_order(order: Order):
-    days_left = order.paid_till.date() - datetime.now().date()
-    time_to_pay = True if days_left < timedelta(days=7) else False
+    days_left = order.paid_till.date() - timezone.now().date()
+    time_to_pay = True if days_left < timezone.timedelta(days=7) else False
     paid_from = order.paid_from.strftime('%d.%m.%Y')
     paid_till = order.paid_till.strftime('%d.%m.%Y')
     return {
@@ -187,5 +186,5 @@ def send_payment_link(request):
             to=[email],
             html_message=get_html_message(serialize_order),
         )
-        mail.send()
+        mail.send(fail_silently=True, timeout=10)
     return redirect('index')

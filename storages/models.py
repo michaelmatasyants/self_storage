@@ -21,6 +21,9 @@ class CustomUser(AbstractUser):
         verbose_name = 'Клиент'
         verbose_name_plural = 'Клиенты'
 
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}, ID {self.id}'
+
 
 class Storage(models.Model):
     title = models.CharField('Склад', max_length=100)

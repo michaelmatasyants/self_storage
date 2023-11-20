@@ -1,14 +1,15 @@
 import schedule
 import time
 from django.core.management.base import BaseCommand
-from datetime import date, timedelta
 from django.core.mail import EmailMessage
+from django.core.mail import mail_managers
+from django.utils import timezone
 
-from storages.models import Box, BoxType, CustomUser, Order, Storage
+from storages.models import Order
 
 
 def delete_unpaid_orders():
-    due_date = datetime.now() - timedelta(days=2) 
+    due_date = timezone.now() - timezone.timedelta(days=2) 
     orders = Order.objects.filter(paid_date=None, created_date__lt=due_date)
     orders.delete()
 
@@ -27,7 +28,7 @@ def send_reminder(order: Order, days_left: int):
 
 
 def send_period_has_expired(order: Order, max_months: int):
-    day_x = order.paid_till + timedelta(days=max_months*30)
+    day_x = order.paid_till + timezone.timedelta(days=max_months*30)
 
     subject = 'Оплаченный период закончился. Штрафная наценка'
     message = f'Оплаченный вами период по заказу №{order.id}, бокс ' \
@@ -41,7 +42,7 @@ def send_period_has_expired(order: Order, max_months: int):
 
 def send_next_debt_months(order: Order, month: int, max_months: int):
     debt = order.box.box_type.price * 1.2 * month
-    day_x = order.paid_till + timedelta(days=max_months*30)
+    day_x = order.paid_till + timezone.timedelta(days=max_months*30)
 
     subject = f'Не оплачен очередной месяц задолженности'
     message = f'Ваша задолженность по заказу №{order.id}, бокс ' \
@@ -68,7 +69,14 @@ def send_mail(subject: str, message: str, recipient_list: list,):
         message,
         to=recipient_list,
     )
-    mail.send()
+    mail.send(fail_silently=True, timeout=5)
+
+
+def send_mail_to_managers(order: Order):
+    subject = 'Очистить бокс'
+    message = f'Клиент {order.client} не оплатил заказ №{order.id},' \
+              f'необходимо освободить бокс №{order.box.id}.'
+    mail_managers(subject, message, fail_silently=True, timeout=15)
 
 
 def check_terms():
@@ -76,7 +84,7 @@ def check_terms():
     orders = Order.objects.filter(is_open=True).select_related('box')
 
     for order in orders:
-        days_left = order.paid_till.date() - datetime.today().date()
+        days_left = order.paid_till.date() - timezone.now().date()
         max_months = 3
 
         if days_left.days >= 0:
@@ -98,13 +106,18 @@ def check_terms():
                 send_last_day_before_withdrawal(order, max_months)
 
         else:
-            pass # закрыть заказ, is_open=False, is_free=True, сообщение менеджеру очистить бокс
+            order.box.is_free = True
+            order.box.save()
+            order.is_open = False
+            order.save()
+            send_mail_to_managers(order)
 
 
 class Command(BaseCommand):
     help = 'проверка сроков оплаты и рассылка уведомлений'
 
-    schedule.every().day.at('00:00', 'Europe/Moscow').do(check_terms)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    def handle(self, *args, **options):
+        schedule.every().day.at('13:12', 'Europe/Moscow').do(check_terms)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
