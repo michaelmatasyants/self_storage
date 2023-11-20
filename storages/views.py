@@ -93,15 +93,20 @@ def choose_boxes(request):
     )
     serialize_storages = []
     for storage in storages:
-        free_boxes = storage.boxes.all()
+        boxes_count = storage.boxes.count()
+        free_boxes = storage.boxes.filter(is_free=True)
         if not free_boxes:
             continue
 
-        storage_box_types = free_boxes.values('box_type').distinct()
+        box_type_ids = free_boxes.values('box_type').distinct()
+        storage_box_types = BoxType.objects.filter(id__in=box_type_ids)
+        min_price = int(min(storage_box_types, key=lambda x: x.price).price)
         serialize_storages.append({
             'storage': serialize_storage(storage),
             'free_boxes_count': free_boxes.count(),
-            'storage_box_types': storage_box_types,
+            'boxes_count': boxes_count,
+            'min_price': min_price,
+            'storage_box_types': storage_box_types
         })
 
     context = {
@@ -115,7 +120,6 @@ def choose_boxes(request):
 @login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
-
     orders = user.orders.all()
     serialized_orders = []
     for order in orders:
