@@ -184,10 +184,8 @@ def send_payment_link(request):
         email = request.user.email
         mail = EmailMessage(
             'Оплата аренды бокса',
-            'обычный текст',
-            recipient_list=[email],
+            to=[email],
             html_message=get_html_message(serialize_order),
-            fail_silently=False
         )
         mail.send()
     return redirect('index')
