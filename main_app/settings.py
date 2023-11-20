@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
-    "phonenumber_field",
+    'phonenumber_field',
     'storages',
     'tinymce',
 ]
@@ -77,7 +77,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'storages.CustomUser'
 
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = '/'
 
 AUTHENTICATION_BACKENDS = ['storages.backends.EmailBackend']
 
