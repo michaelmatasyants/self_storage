@@ -4,6 +4,7 @@ from main_app.settings import SELF_STORAGE_URL, YOOKASSA_SHOP_ID, YOOKASSA_SECRE
 import uuid
 from yookassa import Configuration, Payment
 
+
 def get_html_message(order: dict):
     filepath = os.path.join('messages', 'message.html')
     with open(filepath, 'r') as file:
