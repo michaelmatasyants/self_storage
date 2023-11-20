@@ -89,9 +89,9 @@ class Order(models.Model):
                             )
     is_open = models.BooleanField('Открыт', default=True)
     created_date = models.DateTimeField('Дата создания', auto_now_add=True)
-    paid_date = models.DateTimeField('Дата оплаты', null=True)
-    paid_from = models.DateTimeField('Оплата с', null=True)
-    paid_till = models.DateTimeField('Оплата до', null=True)
+    paid_date = models.DateTimeField('Дата оплаты', null=True, blank=True)
+    paid_from = models.DateTimeField('Оплата с', null=True, blank=True)
+    paid_till = models.DateTimeField('Оплата до', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Заказ'
