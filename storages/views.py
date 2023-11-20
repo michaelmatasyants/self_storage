@@ -8,10 +8,8 @@ from django.utils import timezone
 
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
-from storages.funcs import get_html_message
+from storages.funcs import get_html_message, get_payment_link
 from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
-
-from django.conf import settings
 
 
 def serialize_storage(storage: Storage):
@@ -171,14 +169,15 @@ def send_payment_link(request):
                                  is_free=True).first()
         box.is_free = False
         box.save()
-
+        
         order = Order.objects.create(client=request.user, box=box)
         serialize_order = {
             '[номер заказа]': order.id,
             '[адрес склада]': f'г. {storage.city}, {storage.address}',
             '[номер бокса]': box.id,
             '[размер бокса]': box_type,
-            '[стоимость]': box_type.price
+            '[стоимость]': box_type.price,
+            '[ссылка на оплату]': get_payment_link(box_type.price, f'оплата заказа {{order.id}}'),
         }
 
         email = request.user.email
@@ -189,5 +188,3 @@ def send_payment_link(request):
         )
         mail.send(fail_silently=True, timeout=10)
     return redirect('index')
-
-
