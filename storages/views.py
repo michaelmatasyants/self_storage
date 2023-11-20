@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ValidationError
@@ -11,6 +10,9 @@ from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
 from storages.funcs import get_html_message
 from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
+import uuid
+from yookassa import Configuration, Payment
+from django.conf import settings
 
 
 def serialize_storage(storage: Storage):
@@ -173,3 +175,22 @@ def send_payment_link(request):
         )
         mail.send()
     return redirect('index')
+
+
+def get_payment_link(value, description):
+    Configuration.account_id = settings.YOOKASSA_SHOP_ID
+    Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
+    payment = Payment.create({
+        "amount": {
+            "value": value,
+            "currency": "RUB"
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": f"{settings.SELF_STORAGE_URL}"
+        },
+        "capture": True,
+        "description": description
+    }, uuid.uuid4())
+
+    return payment.confirmation.confirmation_url
