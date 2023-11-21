@@ -212,11 +212,11 @@ def order_box(request, box_type, storage_id):
     # ordered_box = Box.objects.get(id=box_id)
     box_type = get_object_or_404(
         BoxType,
-        id=request.POST.get('box_type')
+        id=int(box_type)
     )
     storage = get_object_or_404(
         Storage,
-        id=request.POST.get('storage')
+        id=int(storage_id)
     )
 
     ordered_box = Box.objects.filter(box_type=box_type,
