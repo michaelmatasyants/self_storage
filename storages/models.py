@@ -2,8 +2,13 @@ from decimal import Decimal
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Max
 from phonenumber_field.modelfields import PhoneNumberField
 from tinymce.models import HTMLField
+
+from storages.bitlink import (is_bitlink, shorten_link,
+                              count_clicks, delete_link)
+from main_app.settings import SELF_STORAGE_URL
 
 
 class CustomUser(AbstractUser):
@@ -115,3 +120,38 @@ class FAQ(models.Model):
 
     def __str__(self):
         return f'{self.question[:50]}...'
+
+
+def create_new_bitlink():
+    max_id = Link.objects.aggregate(Max('id'))['id__max']
+    if not max_id:
+        max_id = 0
+    next_bitlink_id = max_id + 1
+    while True:
+        if not is_bitlink(SELF_STORAGE_URL, next_bitlink_id):
+            return shorten_link(SELF_STORAGE_URL, next_bitlink_id)
+        next_bitlink_id += 1
+
+
+class Link(models.Model):
+    shorten_link = models.CharField(
+        'Сокращенная ссылка',
+        max_length=20,
+        null=True, blank=True,
+        default=create_new_bitlink)
+    place_of_use = models.CharField(
+        'Место использования ссылки',
+        max_length=50,
+        null=True, blank=True)
+
+    def delete(self, *args, **kwargs):
+        delete_link(self.shorten_link)
+        super().delete(*args, **kwargs)
+
+    @property
+    def clicks(self):
+        return count_clicks(self.shorten_link)
+
+    class Meta:
+        verbose_name = 'Ссылка'
+        verbose_name_plural = 'Ссылки'

@@ -9,4 +9,4 @@ django-tinymce==3.6.1
 pytz==2023.3.post1
 schedule==1.2.0
 yookassa==2.5.0
-
+requests==2.30.0
