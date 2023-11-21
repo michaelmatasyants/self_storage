@@ -21,6 +21,9 @@ class CustomUser(AbstractUser):
         verbose_name = 'Клиент'
         verbose_name_plural = 'Клиенты'
 
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}, ID {self.id}'
+
 
 class Storage(models.Model):
     title = models.CharField('Склад', max_length=100)
@@ -34,7 +37,7 @@ class Storage(models.Model):
         verbose_name_plural = 'Склады'
 
     def __str__(self):
-        return f'{self.title} адрес: {self.city} {self.address}'
+        return f'г. {self.city}, {self.address}'
 
 
 class BoxType(models.Model):
@@ -88,9 +91,11 @@ class Order(models.Model):
                             null=True,
                             verbose_name='Бокс',
                             )
-    paid_date = models.DateTimeField('Дата оплаты', null=True)
-    paid_from = models.DateTimeField('Оплата с', null=True)
-    paid_till = models.DateTimeField('Оплата до', null=True)
+    is_open = models.BooleanField('Открыт', default=True)
+    created_date = models.DateTimeField('Дата создания', auto_now_add=True)
+    paid_date = models.DateTimeField('Дата оплаты', null=True, blank=True)
+    paid_from = models.DateTimeField('Оплата с', null=True, blank=True)
+    paid_till = models.DateTimeField('Оплата до', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Заказ'

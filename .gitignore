@@ -85,6 +85,7 @@ target/
 *.pot
 
 .env
+db.sqlite3
 media/
 venv/
 **.vscode

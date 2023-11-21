@@ -15,7 +15,7 @@ class StorageAdmin(admin.ModelAdmin):
 
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'title', 'box_type', 'is_free']
 
 
 @admin.register(Order)

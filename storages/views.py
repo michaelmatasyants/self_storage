@@ -1,5 +1,3 @@
-from datetime import date, datetime, timedelta
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -35,6 +33,20 @@ def serialize_user(user: CustomUser):
     }
 
 
+def serialize_order(order: Order):
+    days_left = order.paid_till.date() - timezone.now().date()
+    time_to_pay = True if days_left < timezone.timedelta(days=7) else False
+    paid_from = order.paid_from.strftime('%d.%m.%Y')
+    paid_till = order.paid_till.strftime('%d.%m.%Y')
+    return {
+        'box_id': order.box.id,
+        'storage_id': order.box.storage.id,
+        'storage_address': order.box.storage.__str__(),
+        'paid_for_period': f'{paid_from} - {paid_till}',
+        'time_to_pay': time_to_pay,
+    }
+
+
 def serialize_faq(question: FAQ):
     return {
         'question': question.question,
@@ -61,7 +73,7 @@ def login_user(request):
     return render(request, "reg_log_forms/login.html", {"form": form})
 
 
-def register_user(request, *args, **kwargs):
+def register_user(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -137,23 +149,10 @@ def choose_boxes(request):
 @login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
-    orders = user.orders.all()
-    serialized_orders = []
-    for order in orders:
-        time_to_pay = False
-        if order.paid_till.date() - datetime.now().date() < timedelta(days=7):
-            time_to_pay = True
-        serialized_orders.append({
-            'order': order,
-            'box_id': order.box.id,
-            'storage_id': order.box.storage.id,
-            'storage_address': order.box.storage.address,
-            'paid_for_period': f'С {order.paid_from.date()} по {order.paid_till.date()}',
-            'time_to_pay': time_to_pay,
-        })
+    orders = user.orders.filter(is_open=True).select_related('box')
     context = {
         'user': serialize_user(user),
-        'orders': serialized_orders,
+        'orders': [serialize_order(order) for order in orders]
     }
     return render(request, 'my-rent.html', context=context)
 
@@ -200,10 +199,8 @@ def send_payment_link(request):
         email = request.user.email
         mail = EmailMessage(
             'Оплата аренды бокса',
-            'обычный текст',
-            recipient_list=[email],
+            to=[email],
             html_message=get_html_message(serialize_order),
-            fail_silently=False
         )
-        mail.send()
+        mail.send(fail_silently=True, timeout=10)
     return redirect('index')

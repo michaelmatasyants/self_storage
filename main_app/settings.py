@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 
 from environs import Env
@@ -89,17 +90,21 @@ EMAIL_PORT = 465
 
 EMAIL_USE_SSL = True
 
-# EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')
-#
-# EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
-#
-# DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL')
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER')
+
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
+
+DEFAULT_FROM_EMAIL = env.str('DEFAULT_FROM_EMAIL')
 
 YOOKASSA_SHOP_ID = env.str('YOOKASSA_SHOP_ID')
 
 YOOKASSA_SECRET_KEY = env.str('YOOKASSA_SECRET_KEY')
 
 YANDEX_IS_TEST = True
+
+MANAGERS_JSON = env.str('MANAGERS', default='[]')
+
+MANAGERS = json.loads(MANAGERS_JSON)
 
 LANGUAGE_CODE = 'ru-ru'
 
