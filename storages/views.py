@@ -20,7 +20,6 @@ def serialize_storage(storage: Storage):
         'address': storage.address,
         'temp': str(storage.temp),
         'photo': storage.photo.url,
-        'boxes': storage.boxes.all(),
     }
 
 
@@ -138,10 +137,7 @@ def choose_boxes(request):
             if action == 'rent_box':
                 new_order = Order(
                     client=request.user,
-                    box=Box.objects.get(pk=1),
-                    paid_date=timezone.now(),
-                    paid_from=timezone.now(),
-                    paid_till=timezone.now(),
+                    is_open=False
                 )
                 new_order.save()
 
