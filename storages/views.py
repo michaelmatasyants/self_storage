@@ -219,5 +219,5 @@ def order_box(request, box_id):
         'price': ordered_box.box_type.price,
         'storage': ordered_box.storage,
     }
-
-    return render(request, 'order_box.html', {'box': box_item})
+    payment_link = get_payment_link(ordered_box.box_type.price, f'оплата заказа {{ordered_box.id}}')
+    return render(request, 'order_box.html', {'box': box_item, 'payment_link': payment_link})
