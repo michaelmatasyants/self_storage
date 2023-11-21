@@ -222,6 +222,13 @@ def order_box(request, box_type, storage_id):
     ordered_box = Box.objects.filter(box_type=box_type,
                                      storage=storage,
                                      is_free=True).first()
+    order = Order.objects.create(
+        client=request.user,
+        box=ordered_box,
+        paid_date=timezone.now(),
+        paid_from=timezone.now(),
+        paid_till=timezone.now() + timezone.timedelta(days=30)
+    )
 
     box_item = {
         'id': ordered_box.id,
