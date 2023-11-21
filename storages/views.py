@@ -6,7 +6,7 @@ from django.db.models import Count, Prefetch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
+from django.urls import reverse
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
 from storages.funcs import get_html_message, get_payment_link
@@ -202,3 +202,20 @@ def send_payment_link(request):
         )
         mail.send(fail_silently=True, timeout=10)
     return redirect('index')
+
+
+def order_box(request, box_id):
+    user = request.user
+    if user.is_anonymous:
+        return redirect(reverse("login"))
+
+    ordered_box = Box.objects.get(id=box_id)
+
+    box_item = {
+        'id': ordered_box.id,
+        'number': ordered_box.title,
+        'price': ordered_box.box_type.price,
+        'storage': ordered_box.storage,
+    }
+    payment_link = get_payment_link(ordered_box.box_type.price, f'оплата заказа {{ordered_box.id}}')
+    return render(request, 'order_box.html', {'box': box_item, 'payment_link': payment_link})
