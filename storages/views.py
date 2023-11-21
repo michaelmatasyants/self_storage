@@ -204,12 +204,24 @@ def send_payment_link(request):
     return redirect('index')
 
 
-def order_box(request, box_id):
+def order_box(request, box_type, storage_id):
     user = request.user
     if user.is_anonymous:
         return redirect(reverse("login"))
 
-    ordered_box = Box.objects.get(id=box_id)
+    # ordered_box = Box.objects.get(id=box_id)
+    box_type = get_object_or_404(
+        BoxType,
+        id=request.POST.get('box_type')
+    )
+    storage = get_object_or_404(
+        Storage,
+        id=request.POST.get('storage')
+    )
+
+    ordered_box = Box.objects.filter(box_type=box_type,
+                                     storage=storage,
+                                     is_free=True).first()
 
     box_item = {
         'id': ordered_box.id,

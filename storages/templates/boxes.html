@@ -224,7 +224,7 @@
 											<!-- Show all boxes for the storage -->
 				{% for storage in storages %}
 					{% for box_type in storage.storage_box_types %}
-						<a href="{% url 'orderbox' box_type.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink">
+						<a href="{% url 'orderbox' box_type.id storage.storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink">
 							<div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
 								<span class="SelfStorage_green fs_24 me-2">1 эт.</span><span class="fs_24">№{{box_type.id}}</span>
 							</div>
