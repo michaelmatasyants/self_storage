@@ -68,11 +68,11 @@
 	<article class="header">
 		<h1 class="text-center fw-bold SelfStorage_green mb-5">Аренда боксов</h1>
 		<h6 class="text-center SelfStorage_grey">Арендуйте склад индивидуального хранения по уникальной цене прямо сейчас</h6>
-		<a href="#pills-tab" id="toBox" class="d-none"></a>
+		<a href="#BOX" id="toBox" class="d-none"></a>
 		<ul class="nav nav-pills mb-3 d-flex justify-content-between" id="boxes-links" role="tablist">
 			{% for storage in storages %}
 				<li class="nav-item flex-grow-1 mx-2" role="presentation">
-					<a href="#pills-tab" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink" id="pills-{{storage.storage.id}}-tab" data-bs-toggle="pill" data-bs-target="#pills-Moscow" role="tab" aria-controls="pills-Moscow" aria-selected="true">
+					<a href="#BOX" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink" id="pills-{{storage.storage.id}}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{storage.storage.id}}" role="tab" aria-controls="pills-{{storage.storage.id}}" aria-selected="true">
 						<div class="col-12 col-lg-3 d-flex justify-content-center">
 							<img src="{{ storage.storage.photo }}" alt="" class="mb-3 mb-lg-0">
 						</div>
@@ -172,7 +172,7 @@
 										{% csrf_token %}
 										<input type="hidden" name="action" value="rent_box">
 										<input type="hidden" name="box_id" value="ID бокса для аренды">
-										<button type="submit" class="btn w-75 fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Арендовать бокс</a>
+										<button type="submit" class="btn w-75 fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_green SelfStorage__btn2_green mb-3">Арендовать бокс</button>
 										<button class="btn w-75 fs_24 px-5 py-3 text-white border-8 SelfStorage__bg_orange SelfStorage__btn2_orange">Позвонить мне</button>
 									</form>
 								</div>
@@ -224,7 +224,7 @@
 											<!-- Show all boxes for the storage -->
 				{% for storage in storages %}
 					{% for box_type in storage.storage_box_types %}
-						<a href="#BOX" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink">
+						<a href="{% url 'orderbox' box_type.id storage.storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink">
 							<div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
 								<span class="SelfStorage_green fs_24 me-2">1 эт.</span><span class="fs_24">№{{box_type.id}}</span>
 							</div>

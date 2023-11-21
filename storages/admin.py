@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from storages.models import Box, BoxType, CustomUser, Order, Storage
+from storages.models import Box, BoxType, CustomUser, Order, Storage, Link
 
 
 @admin.register(CustomUser)
@@ -15,7 +15,7 @@ class StorageAdmin(admin.ModelAdmin):
 
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['id', 'title', 'box_type', 'is_free']
 
 
 @admin.register(Order)
@@ -25,3 +25,10 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(BoxType)
 class BoxType(admin.ModelAdmin):
     pass
+
+@admin.register(Link)
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ('id', 'shorten_link', 'place_of_use', 'clicks_count')
+
+    def clicks_count(self, instance):
+        return instance.clicks

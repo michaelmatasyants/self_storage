@@ -1,5 +1,3 @@
-from datetime import date, datetime, timedelta
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -8,10 +6,10 @@ from django.db.models import Count, Prefetch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
+from django.urls import reverse
 from storages.backends import EmailBackend
 from storages.forms import LoginForm, RegistrationForm
-from storages.funcs import get_html_message
+from storages.funcs import get_html_message, get_payment_link
 from storages.models import FAQ, Box, BoxType, CustomUser, Order, Storage
 
 
@@ -22,7 +20,6 @@ def serialize_storage(storage: Storage):
         'address': storage.address,
         'temp': str(storage.temp),
         'photo': storage.photo.url,
-        'boxes': storage.boxes.all(),
     }
 
 
@@ -32,6 +29,20 @@ def serialize_user(user: CustomUser):
         'last_name': user.last_name,
         'email': user.email,
         'phone': user.phone,
+    }
+
+
+def serialize_order(order: Order):
+    days_left = order.paid_till.date() - timezone.now().date()
+    time_to_pay = True if days_left < timezone.timedelta(days=7) else False
+    paid_from = order.paid_from.strftime('%d.%m.%Y')
+    paid_till = order.paid_till.strftime('%d.%m.%Y')
+    return {
+        'box_id': order.box.id,
+        'storage_id': order.box.storage.id,
+        'storage_address': order.box.storage.__str__(),
+        'paid_for_period': f'{paid_from} - {paid_till}',
+        'time_to_pay': time_to_pay,
     }
 
 
@@ -61,7 +72,7 @@ def login_user(request):
     return render(request, "reg_log_forms/login.html", {"form": form})
 
 
-def register_user(request, *args, **kwargs):
+def register_user(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -126,10 +137,7 @@ def choose_boxes(request):
             if action == 'rent_box':
                 new_order = Order(
                     client=request.user,
-                    box=Box.objects.get(pk=1),
-                    paid_date=timezone.now(),
-                    paid_from=timezone.now(),
-                    paid_till=timezone.now(),
+                    is_open=False
                 )
                 new_order.save()
 
@@ -139,23 +147,10 @@ def choose_boxes(request):
 @login_required(login_url="login")
 def show_personal_account(request):
     user = request.user
-    orders = user.orders.all()
-    serialized_orders = []
-    for order in orders:
-        time_to_pay = False
-        if order.paid_till.date() - datetime.now().date() < timedelta(days=7):
-            time_to_pay = True
-        serialized_orders.append({
-            'order': order,
-            'box_id': order.box.id,
-            'storage_id': order.box.storage.id,
-            'storage_address': order.box.storage.address,
-            'paid_for_period': f'С {order.paid_from.date()} по {order.paid_till.date()}',
-            'time_to_pay': time_to_pay,
-        })
+    orders = user.orders.filter(is_open=True).select_related('box')
     context = {
         'user': serialize_user(user),
-        'orders': serialized_orders,
+        'orders': [serialize_order(order) for order in orders]
     }
     return render(request, 'my-rent.html', context=context)
 
@@ -188,23 +183,51 @@ def send_payment_link(request):
                                  is_free=True).first()
         box.is_free = False
         box.save()
-
+        
         order = Order.objects.create(client=request.user, box=box)
         serialize_order = {
             '[номер заказа]': order.id,
             '[адрес склада]': f'г. {storage.city}, {storage.address}',
             '[номер бокса]': box.id,
             '[размер бокса]': box_type,
-            '[стоимость]': box_type.price
+            '[стоимость]': box_type.price,
+            '[ссылка на оплату]': get_payment_link(box_type.price, f'оплата заказа {{order.id}}'),
         }
 
         email = request.user.email
         mail = EmailMessage(
             'Оплата аренды бокса',
-            'обычный текст',
-            recipient_list=[email],
+            to=[email],
             html_message=get_html_message(serialize_order),
-            fail_silently=False
         )
-        mail.send()
+        mail.send(fail_silently=True, timeout=10)
     return redirect('index')
+
+
+def order_box(request, box_type, storage_id):
+    user = request.user
+    if user.is_anonymous:
+        return redirect(reverse("login"))
+
+    # ordered_box = Box.objects.get(id=box_id)
+    box_type = get_object_or_404(
+        BoxType,
+        id=request.POST.get('box_type')
+    )
+    storage = get_object_or_404(
+        Storage,
+        id=request.POST.get('storage')
+    )
+
+    ordered_box = Box.objects.filter(box_type=box_type,
+                                     storage=storage,
+                                     is_free=True).first()
+
+    box_item = {
+        'id': ordered_box.id,
+        'number': ordered_box.title,
+        'price': ordered_box.box_type.price,
+        'storage': ordered_box.storage,
+    }
+    payment_link = get_payment_link(ordered_box.box_type.price, f'оплата заказа {{ordered_box.id}}')
+    return render(request, 'order_box.html', {'box': box_item, 'payment_link': payment_link})

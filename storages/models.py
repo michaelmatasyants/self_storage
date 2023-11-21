@@ -2,8 +2,13 @@ from decimal import Decimal
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Max
 from phonenumber_field.modelfields import PhoneNumberField
 from tinymce.models import HTMLField
+
+from storages.bitlink import (is_bitlink, shorten_link,
+                              count_clicks, delete_link)
+from main_app.settings import SELF_STORAGE_URL
 
 
 class CustomUser(AbstractUser):
@@ -21,6 +26,9 @@ class CustomUser(AbstractUser):
         verbose_name = 'Клиент'
         verbose_name_plural = 'Клиенты'
 
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}, ID {self.id}'
+
 
 class Storage(models.Model):
     title = models.CharField('Склад', max_length=100)
@@ -34,7 +42,7 @@ class Storage(models.Model):
         verbose_name_plural = 'Склады'
 
     def __str__(self):
-        return f'{self.title} адрес: {self.city} {self.address}'
+        return f'г. {self.city}, {self.address}'
 
 
 class BoxType(models.Model):
@@ -76,6 +84,7 @@ class Box(models.Model):
 
 
 class Order(models.Model):
+
     client = models.ForeignKey(CustomUser,
                                on_delete=models.CASCADE,
                                related_name='orders',
@@ -87,9 +96,11 @@ class Order(models.Model):
                             null=True,
                             verbose_name='Бокс',
                             )
-    paid_date = models.DateTimeField('Дата оплаты', null=True)
-    paid_from = models.DateTimeField('Оплата с', null=True)
-    paid_till = models.DateTimeField('Оплата до', null=True)
+    is_open = models.BooleanField('Открыт', default=True)
+    created_date = models.DateTimeField('Дата создания', auto_now_add=True)
+    paid_date = models.DateTimeField('Дата оплаты', null=True, blank=True)
+    paid_from = models.DateTimeField('Оплата с', null=True, blank=True)
+    paid_till = models.DateTimeField('Оплата до', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Заказ'
@@ -109,3 +120,38 @@ class FAQ(models.Model):
 
     def __str__(self):
         return f'{self.question[:50]}...'
+
+
+def create_new_bitlink():
+    max_id = Link.objects.aggregate(Max('id'))['id__max']
+    if not max_id:
+        max_id = 0
+    next_bitlink_id = max_id + 1
+    while True:
+        if not is_bitlink(SELF_STORAGE_URL, next_bitlink_id):
+            return shorten_link(SELF_STORAGE_URL, next_bitlink_id)
+        next_bitlink_id += 1
+
+
+class Link(models.Model):
+    shorten_link = models.CharField(
+        'Сокращенная ссылка',
+        max_length=20,
+        null=True, blank=True,
+        default=create_new_bitlink)
+    place_of_use = models.CharField(
+        'Место использования ссылки',
+        max_length=50,
+        null=True, blank=True)
+
+    def delete(self, *args, **kwargs):
+        delete_link(self.shorten_link)
+        super().delete(*args, **kwargs)
+
+    @property
+    def clicks(self):
+        return count_clicks(self.shorten_link)
+
+    class Meta:
+        verbose_name = 'Ссылка'
+        verbose_name_plural = 'Ссылки'
