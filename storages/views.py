@@ -116,11 +116,13 @@ def choose_boxes(request):
         box_type_ids = free_boxes.values('box_type').distinct()
         storage_box_types = BoxType.objects.filter(id__in=box_type_ids)
         min_price = int(min(storage_box_types, key=lambda x: x.price).price)
+        storage_box_max_height = int(max(storage_box_types, key=lambda x: x.height).height)
         serialize_storages.append({
             'storage': serialize_storage(storage),
             'free_boxes_count': free_boxes.count(),
             'boxes_count': boxes_count,
             'min_price': min_price,
+            'max_height': storage_box_max_height,
             'storage_box_types': storage_box_types
         })
 
