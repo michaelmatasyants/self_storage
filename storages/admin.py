@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from storages.models import Box, BoxType, CustomUser, Order, Storage, Link
+from storages.models import Box, BoxType, CustomUser, Link, Order, Storage
 
 
 @admin.register(CustomUser)
@@ -15,7 +15,7 @@ class StorageAdmin(admin.ModelAdmin):
 
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'box_type', 'is_free']
+    list_display = ['id', 'title', 'box_type', 'is_free', 'storage']
 
 
 @admin.register(Order)
