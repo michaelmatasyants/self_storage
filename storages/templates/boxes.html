@@ -231,13 +231,13 @@
 							{% for box_type in storage.storage_box_types%}
 								<a href="{% url 'orderbox' box_type.id storage.storage.id %}" class="row text-decoration-none py-3 px-4 mt-5 SelfStorage__boxlink">
 									<div class="col-12 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-										<span class="SelfStorage_green fs_24 me-2">1 эт.</span><span class="fs_24">№{{box_type.id}}</span>
+										<span class="SelfStorage_green fs_24 me-2">№{{box_type.id}}</span>
 									</div>
 									<div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-										<span class="fs_24">2 м² изменить</span>
+										<span class="fs_24">2 м²</span>
 									</div>
 									<div class="col-6 col-md-4 col-lg-3 d-flex justify-content-center align-items-center">
-										<span class="fs_24">{{box_type.length}} х {{box_type.width}} х {{box_type.height}} м²</span>
+										<span class="fs_24">{{box_type.length}}м х {{box_type.width}}м х {{box_type.height}}м</span>
 									</div>
 									<div class="col-12 col-lg-3">
 										<span class="btn my-2 w-100 text-white fs_24 SelfStorage__bg_orange SelfStorage__btn2_orange border-8">От {{box_type.price}} ₽</span>

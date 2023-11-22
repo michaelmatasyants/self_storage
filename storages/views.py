@@ -103,7 +103,7 @@ def index(request):
 
 def choose_boxes(request):
     storages = Storage.objects.prefetch_related(
-        Prefetch('boxes', queryset=Box.objects.filter(is_free=True))
+        Prefetch('boxes')
     )
     serialize_storages = []
     for storage in storages:
@@ -131,15 +131,15 @@ def choose_boxes(request):
         'registration_form': RegistrationForm()
     }
 
-    if request.method == 'POST':
-        if 'action' in request.POST:
-            action = request.POST['action']
-            if action == 'rent_box':
-                new_order = Order(
-                    client=request.user,
-                    is_open=False
-                )
-                new_order.save()
+    # if request.method == 'POST':
+    #     if 'action' in request.POST:
+    #         action = request.POST['action']
+    #         if action == 'rent_box':
+    #             new_order = Order(
+    #                 client=request.user,
+    #                 is_open=False
+    #             )
+    #             new_order.save()
 
     return render(request, 'boxes.html', context=context)
 
