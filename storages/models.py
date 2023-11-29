@@ -27,7 +27,7 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Клиенты'
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}, ID {self.id}'
+        return f'{self.id}. {self.username}'
 
 
 class Storage(models.Model):
@@ -107,7 +107,7 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return f'{self.client} бокс: {self.box}'
+        return f'Клиент {self.client}, бокс: {self.box}'
 
 
 class FAQ(models.Model):
